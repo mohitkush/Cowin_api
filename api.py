@@ -10,7 +10,7 @@ from playsound import playsound
 date = datetime.today() + timedelta(days=1)
 date = date.strftime('%d-%m-%Y')
 print(date)
-pincode = ['451221','451224','451228']
+pincode = ['451221','451224','451228','451115','451331','451001','451441']
 temp_user_agent = UserAgent()
 browser_header = {'User-Agent': temp_user_agent.random}
 
@@ -19,12 +19,19 @@ def check_vaccine():
         for pin in pincode:
             base_url = "https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/findByPin?pincode="+pin+"&date="+str(date)
             r = requests.get(base_url, headers = browser_header)
+        
             if r.status_code == 200:
+                print(pin)
                 json_data = json.loads(r.content)
                 for center in json_data['sessions']:
                     if center['min_age_limit'] == 45:
-                        print(pin)
+                        print("Available at: ", pin)
                         return 0
+            elif r.status_code == 403:
+                 print('Cowin server down')
+            else:
+               print("stuck at: ",pin)
+               continue
 
 check_vaccine()
 driver = webdriver.Chrome(ChromeDriverManager().install())
